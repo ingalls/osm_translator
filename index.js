@@ -49,7 +49,7 @@ function lookup(i) {
         request.get(baseNom + encodeURIComponent(queries[i].query + params), function(err, res, body) {
             if (err) setTimeout(function () { lookup(i);}, 1500);
             var result = JSON.parse(body)[0];
-            if (!result.osm_type || !result.osm_id) {
+            if (!result || !result.osm_type || !result.osm_id) {
                 console.error("Could not parse Nominatim response for ", query.query);
                 console.error(body);
                 if (argv.skip) setTimeout(function() {lookup(++i); }, 1500);
@@ -61,7 +61,7 @@ function lookup(i) {
                 request.get(baseOSM + queries[i].type + "/" + queries[i].id, function(err, res, body) {
                 if (err) setTimeout(function () { lookup(i);}, 1500);
                     var obj = JSON.parse(parser.toJson(body));
-                    if (!obj.osm[queries[i].type].tag) {
+                    if (!obj || !obj.osm[queries[i].type].tag) {
                         console.error("Could not parse OSM response for ", query.query);
                         console.error(body);
                         if (argv.skip) setTimeout(function() {lookup(++i); }, 1500);
