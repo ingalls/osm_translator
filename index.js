@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 var argv = require('minimist')(process.argv, {
     'string': ['help', 'email'],
+    'integer': ['test']
 });
 
 if (argv.help || !argv.email) {
-    console.log('./index.js FILE\n --email EMAIL');
-    console.log('Where FILE the name of one location per line');
+    console.log('./index.js FILE\n --email EMAIL [--test ROWS]');
+    console.log('FILE a file containing the name of one location per line');
+    console.log('--test ROWS Number of rows to test with');
     process.exit();
 }
 var input = argv._[2];
@@ -27,17 +29,18 @@ var rl = readline.createInterface({
 });
 
 rl.on('line', function (line) {
-   queries.push({ "query": line.split('"').join('') }); 
+    queries.push({ "query": line.split('"').join('') }); 
 });
 
 rl.on('close', function () {
+    if (argv.test && argv.test < queries.length) queries = queries.slice(0, argv.test);
     lookup(0);
 });
 
 var languages = [];
 
 function lookup(i) {
-    if (i === queries.length - 1) writer();
+    if (i === argv.test ? argv.test : queries.length - 1) writer();
     else {
         request.get(baseNom + encodeURIComponent(queries[i].query + params), function(err, res, body) {
             if (err) setTimeout(function () { lookup(i);}, 1500);
