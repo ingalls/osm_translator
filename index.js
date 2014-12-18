@@ -6,7 +6,7 @@ var argv = require('minimist')(process.argv, {
 });
 
 if (argv.help || !argv.email) {
-    console.log('./index.js FILE\n --email EMAIL [--test ROWS] [--skip] [--debug]');
+    console.log('./index.js FILE --email EMAIL [--test ROWS] [--skip] [--debug]');
     console.log('FILE a file containing the name of one location per line');
     console.log('--test ROWS Number of rows to test with');
     console.log('--skip Skip errors and continue');
