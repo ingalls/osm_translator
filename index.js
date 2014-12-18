@@ -45,25 +45,25 @@ var languages = [];
 function lookup(i) {
     if (i === queries.length -1) writer();
     else {
-        if (argv.debug) console.err(baseNom + encodeURIComponent(queries[i].query + params));
+        if (argv.debug) console.error(baseNom + encodeURIComponent(queries[i].query + params));
         request.get(baseNom + encodeURIComponent(queries[i].query + params), function(err, res, body) {
             if (err) setTimeout(function () { lookup(i);}, 1500);
             var result = JSON.parse(body)[0];
             if (!result.osm_type || !result.osm_id) {
-                console.err("Could not parse Nominatim response for ", query.query);
-                console.err(body);
+                console.error("Could not parse Nominatim response for ", query.query);
+                console.error(body);
                 if (argv.skip) setTimeout(function() {lookup(++i); }, 1500);
                 else process.exit(1);
             } else {
                 queries[i].type = result.osm_type;
                 queries[i].id = result.osm_id;
-                if (argv.debug) console.err(baseOSM + queries[i].type + "/" + queries[i].id);
+                if (argv.debug) console.error(baseOSM + queries[i].type + "/" + queries[i].id);
                 request.get(baseOSM + queries[i].type + "/" + queries[i].id, function(err, res, body) {
                 if (err) setTimeout(function () { lookup(i);}, 1500);
                     var obj = JSON.parse(parser.toJson(body));
                     if (!obj.osm[queries[i].type].tag) {
-                        console.err("Could not parse OSM response for ", query.query);
-                        console.err(body);
+                        console.error("Could not parse OSM response for ", query.query);
+                        console.error(body);
                         if (argv.skip) setTimeout(function() {lookup(++i); }, 1500);
                         else process.exit(1);
                     } else {
