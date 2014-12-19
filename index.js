@@ -48,41 +48,46 @@ function lookup(i) {
         if (argv.debug) console.error(baseNom + encodeURIComponent(queries[i].query + params));
         request.get(baseNom + encodeURIComponent(queries[i].query + params), function(err, res, body) {
             if (err || res.statusCode !== 200) setTimeout(function () { lookup(i);}, 1500);
-            var result = JSON.parse(body)[0];
-            if (!result || !result.osm_type || !result.osm_id) {
-                console.error("Could not parse Nominatim response for ", queries[i].query);
-                console.error(body);
-                if (argv.skip) setTimeout(function() {lookup(++i); }, 1500);
-                else process.exit(1);
-            } else {
-                queries[i].type = result.osm_type;
-                queries[i].id = result.osm_id;
-                if (argv.debug) console.error(baseOSM + queries[i].type + "/" + queries[i].id);
-                request.get(baseOSM + queries[i].type + "/" + queries[i].id, function(err, res, body) {
-                if (err || res.statusCode !== 200) setTimeout(function () { lookup(i);}, 1500);
-                    var obj;
-                    try {
-                        obj = JSON.parse(parser.toJson(body));
-                    } catch (err) {
-                        obj = null;
-                    }
-                    if (!obj || !obj.osm[queries[i].type].tag) {
-                        console.error("Could not parse OSM response for ", queries[i].query);
-                        console.error(body);
-                        if (argv.skip) setTimeout(function() {lookup(++i); }, 1500);
-                        else process.exit(1);
-                    } else {
-                        obj.osm[queries[i].type].tag.forEach(function(tag) {
-                            if (tag.k.indexOf('name') !== -1) {
-                                if (languages.indexOf(tag.k) === -1) languages.push(tag.k);
-                                queries[i][tag.k] = tag.v;
+            else {
+                var result = JSON.parse(body)[0];
+                if (!result || !result.osm_type || !result.osm_id) {
+                    console.error("Could not parse Nominatim response for ", queries[i].query);
+                    console.error(body);
+                    if (argv.skip) setTimeout(function() {lookup(++i); }, 1500);
+                    else process.exit(1);
+                } else {
+                    queries[i].type = result.osm_type;
+                    queries[i].id = result.osm_id;
+                    if (argv.debug) console.error(baseOSM + queries[i].type + "/" + queries[i].id);
+                    request.get(baseOSM + queries[i].type + "/" + queries[i].id, function(err, res, body) {
+                        if (err || res.statusCode !== 200) setTimeout(function () { lookup(i);}, 1500);
+                        else {
+                            var obj;
+                            try {
+                                obj = JSON.parse(parser.toJson(body));
+                            } catch (err) {
+                                obj = null;
                             }
-                        });
-                        setTimeout(function() {lookup(++i); }, 1500);
-                    }
-                });
+                            if (!obj || !obj.osm[queries[i].type].tag) {
+                                console.error("Could not parse OSM response for ", queries[i].query);
+                                console.error(body);
+                                if (argv.skip) setTimeout(function() {lookup(++i); }, 1500);
+                                else process.exit(1);
+                            } else {
+                                obj.osm[queries[i].type].tag.forEach(function(tag) {
+                                    if (tag.k.indexOf('name') !== -1) {
+                                        if (languages.indexOf(tag.k) === -1) languages.push(tag.k);
+                                        queries[i][tag.k] = tag.v;
+                                    }
+                                });
+                                setTimeout(function() {lookup(++i); }, 1500);
+                            }
+                        }
+                    });
+                }
             }
         });
+
     }
 }
 
