@@ -60,7 +60,12 @@ function lookup(i) {
                 if (argv.debug) console.error(baseOSM + queries[i].type + "/" + queries[i].id);
                 request.get(baseOSM + queries[i].type + "/" + queries[i].id, function(err, res, body) {
                 if (err) setTimeout(function () { lookup(i);}, 1500);
-                    var obj = JSON.parse(parser.toJson(body));
+                    var obj;
+                    try {
+                        obj = JSON.parse(parser.toJson(body));
+                    } catch (err) {
+                        obj = null;
+                    }
                     if (!obj || !obj.osm[queries[i].type].tag) {
                         console.error("Could not parse OSM response for ", queries[i].query);
                         console.error(body);
