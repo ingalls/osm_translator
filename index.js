@@ -47,7 +47,7 @@ function lookup(i) {
     else {
         if (argv.debug) console.error(baseNom + encodeURIComponent(queries[i].query + params));
         request.get(baseNom + encodeURIComponent(queries[i].query + params), function(err, res, body) {
-            if (err || res.statusCode !== 200) setTimeout(function () { lookup(i);}, 1500);
+            if (err || res.statusCode !== 200) setTimeout(function () { lookup(++i);}, 1500);
             else {
                 var result = JSON.parse(body)[0];
                 if (!result || !result.osm_type || !result.osm_id) {
@@ -60,7 +60,7 @@ function lookup(i) {
                     queries[i].id = result.osm_id;
                     if (argv.debug) console.error(baseOSM + queries[i].type + "/" + queries[i].id);
                     request.get(baseOSM + queries[i].type + "/" + queries[i].id, function(err, res, body) {
-                        if (err || res.statusCode !== 200) setTimeout(function () { lookup(i);}, 1500);
+                        if (err || res.statusCode !== 200) setTimeout(function () { lookup(++i);}, 1500);
                         else {
                             var obj;
                             try {
